@@ -81,6 +81,11 @@ function curlToPHP(curl) {
 			headers[toTitleCase(name)] = value;
 		}
 
+		// this handles cookies as a string, won't do good with a cookiejar's filename though
+		if (req.cookies && req.cookies.length > 0) {
+		    php += 'curl_setopt($ch, CURLOPT_COOKIE, ' + phpExpandEnv(req.cookies[0]) + ');\n';
+		}
+
 		// set request type header
 		if (req.method == "POST")
 			php += 'curl_setopt($ch, CURLOPT_POST, 1);\n';
@@ -217,6 +222,10 @@ function curlToPHP(curl) {
 			relevant.headers = relevant.headers.concat(cmd.H);
 		if (cmd.header)
 			relevant.headers = relevant.headers.concat(cmd.header);
+
+		// time to get some cookies
+		if (cmd.b) relevant.cookies = cmd.b;
+		if (cmd.cookie) relevant.cookies = cmd.cookie;
 
 		// set method to HEAD?
 		if (cmd.I || cmd.head)
